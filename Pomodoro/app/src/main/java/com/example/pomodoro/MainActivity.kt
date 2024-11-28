@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -89,10 +90,10 @@ fun PomodoroApp(modifier: Modifier = Modifier) {
         mutableStateOf(Color.Green)
     }
     var timeLeft by remember {
-        mutableStateOf(0)
+        mutableIntStateOf(0)
     }
     var reps by remember {
-        mutableStateOf(1)
+        mutableIntStateOf(1)
     }
     var reset by remember {
         mutableStateOf(false)
@@ -101,7 +102,10 @@ fun PomodoroApp(modifier: Modifier = Modifier) {
         mutableStateOf("")
     }
     var imageResource by remember {
-        mutableStateOf(R.drawable.green_tomato)
+        mutableIntStateOf(R.drawable.green_tomato)
+    }
+    var isStarting by remember {
+        mutableStateOf(true)
     }
 
     var job: Job? by remember { mutableStateOf(null) }
@@ -139,6 +143,7 @@ fun PomodoroApp(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(40.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
             Button(onClick = {
+                isStarting = false
                 reset = false
                 job = scope.launch {
                     while (true) {
@@ -170,11 +175,12 @@ fun PomodoroApp(modifier: Modifier = Modifier) {
                     }
                 }
 
-            }) {
+            }, enabled = isStarting) {
                 Text(text = "Start")
             }
             Spacer(modifier = Modifier.width(40.dp))
             Button(onClick = {
+                isStarting = true
                 job?.cancel()
                 reps = 1
                 title = "Timer"
@@ -183,7 +189,7 @@ fun PomodoroApp(modifier: Modifier = Modifier) {
                 timeLeft = 0
                 checkMark = ""
                 reset = true
-            }) {
+            }, enabled = !isStarting) {
                 Text(text = "Reset")
             }
 
@@ -197,6 +203,7 @@ fun PomodoroApp(modifier: Modifier = Modifier) {
         )
     }
 }
+
 
 @Composable
 fun PlayRingtone(context: Context, reps: Int, reset: Boolean) {
