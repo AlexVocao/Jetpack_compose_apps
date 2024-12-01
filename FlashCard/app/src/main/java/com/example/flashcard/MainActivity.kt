@@ -62,7 +62,7 @@ class MainActivity : ComponentActivity() {
 
 // Define the FlashCard data class
 data class FlashCard(val englishWord: String, val vietnameseTranslation: String)
-data class FlashCardData(val kitchen: List<FlashCard>, val political: List<FlashCard>)
+data class FlashCardData(val kitchen: List<FlashCard>, val political: List<FlashCard>, val daily: List<FlashCard>)
 
 fun loadFlashCardsFromJson(context: Context): FlashCardData? {
     return try {
@@ -182,7 +182,13 @@ fun FlashCardGame(modifier: Modifier = Modifier) {
             flashCards = loadFlashCardsFromJson(context)?.political?.toMutableList() ?: emptyList<FlashCard>().toMutableList()
             currentCard = flashCards.random()
             isFlipped = false
+        } else if (option.lowercase() == "daily") {
+            option = ""
+            flashCards = loadFlashCardsFromJson(context)?.daily?.toMutableList() ?: emptyList<FlashCard>().toMutableList()
+            currentCard = flashCards.random()
+            isFlipped = false
         }
+
     }
 
 }
