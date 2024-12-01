@@ -1,0 +1,14 @@
+{
+  "kitchen": [
+    { "englishWord": "Knife", "vietnameseTranslation": "Con dao" },
+    { "englishWord": "Fork", "vietnameseTranslation": "Cái nĩa" },
+    { "englishWord": "Spoon", "vietnameseTranslation": "Cái thìa" },
+    { "englishWord": "Plate", "vietnameseTranslation": "Cái đĩa" }
+  ],
+  "political": [
+    { "englishWord": "Democracy", "vietnameseTranslation": "Chế độ dân chủ" },
+    { "englishWord": "Republic", "vietnameseTranslation": "Cộng hòa" },
+    { "englishWord": "Monarchy", "vietnameseTranslation": "Quân chủ" },
+    { "englishWord": "Election", "vietnameseTranslation": "Cuộc bầu cử" }
+  ]
+}

@@ -1,13 +1,12 @@
 package com.example.flashcard
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,8 +17,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -35,13 +32,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.flashcard.ui.theme.FlashCardTheme
+import com.google.gson.Gson
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,59 +62,24 @@ class MainActivity : ComponentActivity() {
 
 // Define the FlashCard data class
 data class FlashCard(val englishWord: String, val vietnameseTranslation: String)
+data class FlashCardData(val kitchen: List<FlashCard>, val political: List<FlashCard>)
 
-// Initialize some sample flashcards
-val flashCardsList = listOf(
-    FlashCard("Hello", "Xin chào"),
-    FlashCard("Goodbye", "Tạm biệt"),
-    FlashCard("Thank you", "Cảm ơn"),
-    FlashCard("Yes", "Vâng"),
-    FlashCard("No", "Không")
-)
-
-val kitchenFlashCards = listOf(
-    FlashCard("Knife", "Con dao"),
-    FlashCard("Fork", "Cái nĩa"),
-    FlashCard("Spoon", "Cái thìa"),
-    FlashCard("Plate", "Cái đĩa"),
-    FlashCard("Cup", "Cốc"),
-    FlashCard("Glass", "Cái ly"),
-    FlashCard("Stove", "Bếp"),
-    FlashCard("Microwave", "Lò vi sóng"),
-    FlashCard("Refrigerator", "Tủ lạnh"),
-    FlashCard("Sink", "Chậu rửa"),
-    FlashCard("Oven", "Lò nướng"),
-    FlashCard("Pan", "Chảo"),
-    FlashCard("Pot", "Nồi"),
-    FlashCard("Chopping board", "Thớt"),
-    FlashCard("Dishwasher", "Máy rửa chén")
-)
-
-val politicalFlashCards = listOf(
-    FlashCard("Democracy", "Chế độ dân chủ"),
-    FlashCard("Republic", "Cộng hòa"),
-    FlashCard("Monarchy", "Quân chủ"),
-    FlashCard("Election", "Cuộc bầu cử"),
-    FlashCard("Candidate", "Ứng cử viên"),
-    FlashCard("Voter", "Cử tri"),
-    FlashCard("Constitution", "Hiến pháp"),
-    FlashCard("Government", "Chính phủ"),
-    FlashCard("President", "Tổng thống"),
-    FlashCard("Prime Minister", "Thủ tướng"),
-    FlashCard("Senate", "Thượng viện"),
-    FlashCard("Congress", "Quốc hội"),
-    FlashCard("Law", "Luật"),
-    FlashCard("Judiciary", "Tư pháp"),
-    FlashCard("Policy", "Chính sách")
-)
+fun loadFlashCardsFromJson(context: Context): FlashCardData? {
+    return try {
+        val jsonString = context.assets.open("flashcards.json").bufferedReader().use { it.readText() }
+        Gson().fromJson(jsonString, FlashCardData::class.java)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
+}
 
 @SuppressLint("MutableCollectionMutableState")
 @Composable
 fun FlashCardGame(modifier: Modifier = Modifier) {
     val context = LocalContext.current
-    // Randomly select a card
     var flashCards by remember {
-        mutableStateOf(flashCardsList.toMutableList())
+        mutableStateOf(loadFlashCardsFromJson(context)?.kitchen?.toMutableList() ?: emptyList<FlashCard>().toMutableList())
     }
     var currentCard by remember { mutableStateOf(flashCards.random()) }
     var isFlipped by remember { mutableStateOf(false) }
@@ -185,7 +147,7 @@ fun FlashCardGame(modifier: Modifier = Modifier) {
             Button(onClick = {
                 flashCards.remove(currentCard)
                 if(flashCards.isEmpty())
-                    flashCards = flashCardsList.toMutableList()
+                    flashCards = loadFlashCardsFromJson(context)?.kitchen?.toMutableList() ?: emptyList<FlashCard>().toMutableList()
                 currentCard = flashCards.random()
                 isFlipped = false
             }) {
@@ -210,14 +172,14 @@ fun FlashCardGame(modifier: Modifier = Modifier) {
             singleLine = true
         )
         println("option = $option")
-        if (option == "kitchen") {
+        if (option.lowercase() == "kitchen") {
             option = ""
-            flashCards = kitchenFlashCards.toMutableList()
+            flashCards = loadFlashCardsFromJson(context)?.kitchen?.toMutableList() ?: emptyList<FlashCard>().toMutableList()
             currentCard = flashCards.random()
             isFlipped = false
-        } else if (option == "political") {
+        } else if (option.lowercase() == "political") {
             option = ""
-            flashCards = politicalFlashCards.toMutableList()
+            flashCards = loadFlashCardsFromJson(context)?.political?.toMutableList() ?: emptyList<FlashCard>().toMutableList()
             currentCard = flashCards.random()
             isFlipped = false
         }
