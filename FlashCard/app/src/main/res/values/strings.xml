@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">Flash Card</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_main">Flash Card</string>
 </resources>
